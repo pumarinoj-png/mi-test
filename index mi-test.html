@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test de Perfiles de Innovación</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a18;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
+.wrap{background:#fff;border-radius:16px;padding:2rem;max-width:620px;width:100%;box-shadow:0 1px 6px rgba(0,0,0,.07);margin:auto}
+h1{font-size:22px;font-weight:500;margin-bottom:6px}
+.desc{font-size:15px;color:#666;margin-bottom:1.5rem;line-height:1.6}
+.prog{height:3px;background:#e5e5e5;border-radius:2px;margin-bottom:1.25rem}
+.prog-fill{height:3px;border-radius:2px;transition:width .3s;background:#1a1a18}
+.counter{font-size:13px;color:#888;margin-bottom:8px}
+.q{font-size:16px;line-height:1.5;margin-bottom:14px}
+.opts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem}
+.opt{padding:9px 18px;border:1px solid #d0d0d0;border-radius:8px;font-size:14px;cursor:pointer;background:#fff;font-family:inherit;transition:all .12s}
+.opt:hover{background:#f0f0ee}
+.opt.sel{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.nav{display:flex;justify-content:space-between}
+.btn{padding:9px 20px;border:1px solid #d0d0d0;border-radius:8px;font-size:14px;cursor:pointer;background:#fff;font-family:inherit}
+.btn:hover{background:#f0f0ee}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.p{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.btn.p:hover{opacity:.85}
+.winner{border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+.wname{font-size:20px;font-weight:500;margin-bottom:6px}
+.wdesc{font-size:14px;line-height:1.6;opacity:.85}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-label{font-size:13px;min-width:200px}
+.bar-track{flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.bar-fill{height:8px;border-radius:4px;transition:width .4s}
+.bar-score{font-size:13px;min-width:24px;text-align:right;color:#888}
+.all-title{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const TITLE="Test de Perfiles de Innovación";
+const DESC="Responde con honestidad según tu forma habitual de actuar. No hay respuestas correctas o incorrectas.";
+const Q=[
+  "Suelo imaginar múltiples soluciones antes que elegir una.",
+  "Me entusiasma proponer ideas fuera de lo convencional.",
+  "Conecto conceptos de distintas áreas con facilidad.",
+  "Disfruto transformar ideas abstractas en pasos concretos.",
+  "Me preocupo de que las cosas realmente ocurran.",
+  "Detecto rápidamente qué recursos o procesos se necesitan.",
+  "Antes de proponer soluciones, prefiero entender profundamente el problema.",
+  "Me gusta observar patrones, tendencias o necesidades no evidentes.",
+  "Disfruto recopilar información para tomar mejores decisiones.",
+  "Suelo ayudar a que otros participen y aporten.",
+  "Me importa mantener energía y cohesión en el equipo.",
+  "Conecto fácilmente personas con talentos complementarios.",
+  "Identifico riesgos o debilidades que otros no ven.",
+  "Me resulta natural priorizar entre muchas opciones.",
+  "Pienso en sostenibilidad y viabilidad a largo plazo."
+];
+const P=[
+  {name:"Generador/a Creativo/a",desc:"Generas ideas con fluidez, conectas conceptos de distintas áreas y propones soluciones fuera de lo convencional."},
+  {name:"Traductor/a Implementador/a",desc:"Transformas ideas abstractas en pasos concretos. Te preocupas de que las cosas realmente ocurran y detectas los recursos necesarios."},
+  {name:"Investigador/a Explorador/a",desc:"Antes de actuar, comprendes profundamente el problema. Observas patrones y recopilas información para tomar mejores decisiones."},
+  {name:"Catalizador/a Colaborativo/a",desc:"Facilitas la participación de otros, mantienes la energía del equipo y conectas personas con talentos complementarios."},
+  {name:"Evaluador/a Estratégico/a",desc:"Identificas riesgos y debilidades, priorizas entre opciones y piensas en la sostenibilidad y viabilidad a largo plazo."}
+];
+const S=[
+  {label:"Nunca",pts:1},
+  {label:"Rara vez",pts:2},
+  {label:"A veces",pts:3},
+  {label:"Frecuentemente",pts:4},
+  {label:"Siempre",pts:5}
+];
+const C=["#7F77DD","#1D9E75","#378ADD","#D85A30","#D4537E"];
+const CL=["#EEEDFE","#E1F5EE","#E6F1FB","#FAECE7","#FBEAF0"];
+let ans=new Array(15).fill(null),step=0;
+function render(){
+  const app=document.getElementById('app');
+  if(step>=15){
+    const scores=P.map((_,pi)=>ans.slice(pi*3,pi*3+3).reduce((a,v)=>a+(v||0),0));
+    const maxS=Math.max(...scores);
+    const wi=scores.indexOf(maxS);
+    const maxPts=Math.max(...S.map(s=>s.pts));
+    let bars=P.map((p,pi)=>'<div class="bar-row"><div class="bar-label" style="color:'+C[pi]+';font-weight:'+(scores[pi]===maxS?500:400)+'">'+p.name+'</div><div class="bar-track"><div class="bar-fill" style="width:'+Math.round((scores[pi]/(3*maxPts))*100)+'%;background:'+C[pi]+'"></div></div><div class="bar-score">'+scores[pi]+'</div></div>').join('');
+    app.innerHTML='<h1>'+TITLE+'</h1><div class="prog"><div class="prog-fill" style="width:100%;background:'+C[wi]+'"></div></div><div class="winner" style="background:'+CL[wi]+'"><div class="wname" style="color:'+C[wi]+'">'+P[wi].name+'</div><div class="wdesc" style="color:'+C[wi]+'">'+P[wi].desc+'</div></div><div class="all-title">Todos tus perfiles</div>'+bars+'<div style="margin-top:1.25rem"><button class="btn" onclick="restart()">↺ Reiniciar</button></div>';
+    return;
+  }
+  const pct=Math.round((step/15)*100);
+  let opts=S.map(s=>'<button class="opt'+(ans[step]===s.pts?' sel':'')+'" onclick="pick('+s.pts+')">'+s.label+'</button>').join('');
+  app.innerHTML='<h1>'+TITLE+'</h1>'+(step===0?'<div class="desc">'+DESC+'</div>':'')+'<div class="prog"><div class="prog-fill" style="width:'+pct+'%"></div></div><div class="counter">'+(step+1)+' de 15</div><div class="q">'+(step+1)+'. '+Q[step]+'</div><div class="opts">'+opts+'</div><div class="nav"><button class="btn" onclick="prev()" '+(step===0?'disabled':'')+'>← Anterior</button><button class="btn p" onclick="next()" '+(ans[step]===null?'disabled':'')+'>Siguiente →</button></div>';
+}
+function pick(v){ans[step]=v;render();}
+function next(){if(ans[step]!==null){step++;render();}}
+function prev(){if(step>0){step--;render();}}
+function restart(){ans=new Array(15).fill(null);step=0;render();}
+render();
+</script>
+</body>
+</html>
